@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Forensics Investigation Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        :root {
+            /* Modern Color Palette */
+            --primary-color: #6366f1;
+            --primary-dark: #4338ca;
+            --primary-light: #818cf8;
+            --secondary-color: #0ea5e9;
+            --accent-color: #f472b6;
+            --success-color: #22c55e;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --background-color: #f8fafc;
+            --surface-color: #ffffff;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Enhanced Sidebar */
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar-header {
+            text-align: center;
+            padding: 1.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .sidebar-header h2 {
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-header p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item i {
+            margin-right: 1rem;
+            font-size: 1.2rem;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(5px);
+        }
+
+        .menu-item.active {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            min-height: 100vh;
+            background: var(--background-color);
+        }
+
+        /* Enhanced Cards */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1rem;
+        }
+
+        .dashboard-card {
+            background: var(--surface-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header h3 {
+            color: var(--primary-color);
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        /* Enhanced Stats */
+        .stat-item {
+            background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        /* Modern Buttons */
+        .action-button {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Activity List */
+        .activity-item {
+            background: var(--surface-color);
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            border-left: 4px solid var(--primary-color);
+            transition: transform 0.3s ease;
+        }
+
+        .activity-item:hover {
+            transform: translateX(5px);
+        }
+
+        /* Form Styling */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+            outline: none;
+        }
+
+        /* Status Badges */
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .status-badge.active {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, var(--success-color), #4ade80);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--primary-dark);
+        }
+
+        /* Update stats grid for better alignment */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Update activity list for scrolling */
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+            padding-right: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Add container for quick actions */
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        /* Update toolbar styling */
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        /* Add these new styles for better organization */
+        .case-info {
+            display: grid;
+            gap: 0.75rem;
+        }
+
+        .case-info p {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .case-info p:last-child {
+            border-bottom: none;
+        }
+
+        /* Add responsive adjustments */
+        @media (max-width: 1024px) {
+            .dashboard-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+            
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h2>Digital Forensics</h2>
+                <p>Investigation Platform</p>
+            </div>
+            <div class="sidebar-menu">
+                <div class="menu-item" onclick="showSection('dashboard')">
+                    📊 Dashboard
+                </div>
+                <div class="menu-item" onclick="showSection('identify')">
+                    🔍 1. Identify
+                </div>
+                <div class="menu-item" onclick="showSection('preserve')">
+                    💾 2. Preserve
+                </div>
+                <div class="menu-item" onclick="showSection('analyze')">
+                    🔬 3. Analyze
+                </div>
+                <div class="menu-item" onclick="showSection('verify')">
+                    ✅ 4. Verify
+                </div>
+                <div class="menu-item" onclick="showSection('report')">
+                    📝 5. Report
+                </div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div id="identify-section" class="forensic-section" style="display:none;">
+                <div class="toolbar">
+                    <h2>Step 1: Identify the Problem</h2>
+                    <span class="status-badge">Active</span>
+                </div>
+                
+                <div class="card-container">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Case Information</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="caseId">Case ID:</label>
+                            <input type="text" id="caseId" value="FOR-2024-001" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="caseTitle">Case Title:</label>
+                            <input type="text" id="caseTitle" placeholder="Enter case title" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="caseDescription">Description:</label>
+                            <textarea id="caseDescription" placeholder="Describe the incident..." class="form-control" rows="4"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentDate">Incident Date:</label>
+                            <input type="datetime-local" id="incidentDate" class="form-control">
+                        </div>
+                        <button class="action-button" onclick="saveCaseInformation()">Save Case Information</button>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Incident Classification</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="incidentType">Incident Type:</label>
+                            <select id="incidentType" class="form-control">
+                                <option value="malware">Malware Infection</option>
+                                <option value="unauthorized">Unauthorized Access</option>
+                                <option value="data-breach">Data Breach</option>
+                                <option value="phishing">Phishing Attack</option>
+                                <option value="dos">Denial of Service</option>
+                                <option value="insider">Insider Threat</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="severityLevel">Severity Level:</label>
+                            <select id="severityLevel" class="form-control">
+                                <option value="critical">Critical</option>
+                                <option value="high">High</option>
+                                <option value="medium">Medium</option>
+                                <option value="low">Low</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="affectedSystems">Affected Systems:</label>
+                            <input type="text" id="affectedSystems" placeholder="List affected systems" class="form-control">
+                        </div>
+                        <button class="action-button" onclick="classifyIncident()">Classify Incident</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-card mt-20">
+                    <div class="card-header">
+                        <h3>Initial Assessment</h3>
+                    </div>
+                    <div id="initialAssessment" class="results-container">
+                        <p>Complete the case information and incident classification to generate an initial assessment.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="preserve-section" class="forensic-section" style="display:none;">
+                <div class="toolbar">
+                    <h2>Step 2: Preservation of Data</h2>
+                    <span class="status-badge">Active</span>
+                </div>
+                
+                <div class="card-container">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Data Acquisition</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="acquisitionMethod">Acquisition Method:</label>
+                            <select id="acquisitionMethod" class="form-control">
+                                <option value="live">Live Acquisition</option>
+                                <option value="dead">Dead Box Acquisition</option>
+                                <option value="logical">Logical Acquisition</option>
+                                <option value="network">Network Capture</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="evidenceSource">Evidence Source:</label>
+                            <input type="text" id="evidenceSource" placeholder="Describe the evidence source" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="hashAlgorithm">Hash Algorithm:</label>
+                            <select id="hashAlgorithm" class="form-control">
+                                <option value="md5">MD5</option>
+                                <option value="sha1">SHA-1</option>
+                                <option value="sha256">SHA-256</option>
+                                <option value="sha512">SHA-512</option>
+                            </select>
+                        </div>
+                        <button class="action-button" onclick="acquireData()">Start Acquisition</button>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Chain of Custody</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="custodianName">Custodian Name:</label>
+                            <input type="text" id="custodianName" placeholder="Enter name" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="custodyDate">Date & Time:</label>
+                            <input type="datetime-local" id="custodyDate" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="custodyAction">Action:</label>
+                            <select id="custodyAction" class="form-control">
+                                <option value="collected">Collected</option>
+                                <option value="transferred">Transferred</option>
+                                <option value="analyzed">Analyzed</option>
+                                <option value="stored">Stored</option>
+                                <option value="returned">Returned</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="custodyNotes">Notes:</label>
+                            <textarea id="custodyNotes" placeholder="Enter notes" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button class="action-button" onclick="addCustodyRecord()">Add Record</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-card mt-20">
+                    <div class="card-header">
+                        <h3>Evidence Log</h3>
+                    </div>
+                    <div id="evidenceLog" class="results-container">
+                        <p>No evidence records have been added yet.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="analyze-section" class="forensic-section" style="display:none;">
+                <div class="toolbar">
+                    <h2>Step 3: Analyze</h2>
+                    <span class="status-badge">Active</span>
+                </div>
+                
+                <div class="card-container">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>File Analysis</h3>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <input type="file" id="fileInput" multiple style="margin-bottom: 10px;">
+                        <button class="action-button" onclick="analyzeFiles()">Analyze Files</button>
+                        <div id="fileAnalysis" class="results-container"></div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Network Analysis</h3>
+                            <span class="status-indicator status-warning"></span>
+                        </div>
+                        <button class="action-button" onclick="analyzeNetwork()">Scan Network</button>
+                        <div id="networkAnalysis" class="results-container"></div>
+                    </div>
+                </div>
+                
+                <div class="card-container mt-20">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Memory Analysis</h3>
+                            <span class="status-indicator status-active"></span>
+                        </div>
+                        <button class="action-button" onclick="analyzeMemory()">Analyze Memory</button>
+                        <div id="memoryAnalysis" class="results-container"></div>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Timeline Analysis</h3>
+                        </div>
+                        <div id="timeline" class="results-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="verify-section" class="forensic-section" style="display:none;">
+                <div class="toolbar">
+                    <h2>Step 4: Verification</h2>
+                    <span class="status-badge">Active</span>
+                </div>
+                
+                <div class="card-container">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Evidence Verification</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="verifyEvidence">Select Evidence:</label>
+                            <select id="verifyEvidence" class="form-control">
+                                <option value="">-- Select Evidence --</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="originalHash">Original Hash:</label>
+                            <input type="text" id="originalHash" class="form-control" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="verificationHash">Verification Hash:</label>
+                            <input type="text" id="verificationHash" class="form-control" readonly>
+                        </div>
+                        <button class="action-button" onclick="verifyEvidence()">Verify Integrity</button>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Findings Validation</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="validationMethod">Validation Method:</label>
+                            <select id="validationMethod" class="form-control">
+                                <option value="peer">Peer Review</option>
+                                <option value="duplicate">Duplicate Analysis</option>
+                                <option value="alternative">Alternative Tools</option>
+                                <option value="cross">Cross-Validation</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="validationNotes">Validation Notes:</label>
+                            <textarea id="validationNotes" class="form-control" rows="4" placeholder="Enter validation notes"></textarea>
+                        </div>
+                        <button class="action-button" onclick="validateFindings()">Validate Findings</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-card mt-20">
+                    <div class="card-header">
+                        <h3>Verification Results</h3>
+                    </div>
+                    <div id="verificationResults" class="results-container">
+                        <p>No verification has been performed yet.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="report-section" class="forensic-section" style="display:none;">
+                <div class="toolbar">
+                    <h2>Step 5: Report</h2>
+                    <span class="status-badge">Active</span>
+                </div>
+                
+                <div class="card-container">
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Report Generation</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="reportType">Report Type:</label>
+                            <select id="reportType" class="form-control">
+                                <option value="executive">Executive Summary</option>
+                                <option value="technical">Technical Report</option>
+                                <option value="legal">Legal Report</option>
+                                <option value="comprehensive">Comprehensive Report</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="includeTimeline">Include Timeline:</label>
+                            <input type="checkbox" id="includeTimeline" checked>
+                        </div>
+                        <div class="form-group">
+                            <label for="includeEvidence">Include Evidence Log:</label>
+                            <input type="checkbox" id="includeEvidence" checked>
+                        </div>
+                        <div class="form-group">
+                            <label for="includeRecommendations">Include Recommendations:</label>
+                            <input type="checkbox" id="includeRecommendations" checked>
+                        </div>
+                        <button class="action-button" onclick="generateReport()">Generate Report</button>
+                    </div>
+                    
+                    <div class="analysis-card">
+                        <div class="card-header">
+                            <h3>Digital Signature</h3>
+                        </div>
+                        <div class="form-group">
+                            <label for="examinerName">Examiner Name:</label>
+                            <input type="text" id="examinerName" class="form-control" placeholder="Enter your name">
+                        </div>
+                        <div class="form-group">
+                            <label for="examinerTitle">Title/Position:</label>
+                            <input type="text" id="examinerTitle" class="form-control" placeholder="Enter your title">
+                        </div>
+                        <div class="form-group">
+                            <label for="certifications">Certifications:</label>
+                            <input type="text" id="certifications" class="form-control" placeholder="Enter your certifications">
+                        </div>
+                        <div class="form-group">
+                            <label for="signatureDate">Date:</label>
+                            <input type="date" id="signatureDate" class="form-control">
+                        </div>
+                        <button class="action-button" onclick="signReport()">Sign Report</button>
+                    </div>
+                </div>
+                
+                <div class="analysis-card mt-20">
+                    <div class="card-header">
+                        <h3>Final Report</h3>
+                    </div>
+                    <div id="reportSection" class="results-container">
+                        <p>Generate a report to view it here.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add this dashboard section after the sidebar -->
+            <div id="dashboard-section" class="forensic-section">
+                <div class="toolbar">
+                    <h2>Investigation Dashboard</h2>
+                    <span class="status-badge active">Live</span>
+                </div>
+
+                <div class="dashboard-grid">
+                    <!-- Case Overview Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Case Overview</h3>
+                        </div>
+                        <div class="case-info">
+                            <p><strong>Case ID:</strong> <span id="dash-case-id">FOR-2024-001</span></p>
+                            <p><strong>Status:</strong> <span id="dash-case-status" class="status-active">Active</span></p>
+                            <p><strong>Incident Type:</strong> <span id="dash-incident-type">-</span></p>
+                            <p><strong>Severity:</strong> <span id="dash-severity">-</span></p>
+                            <p><strong>Start Date:</strong> <span id="dash-start-date">-</span></p>
+                            <p><strong>Last Updated:</strong> <span id="dash-last-updated">-</span></p>
+                        </div>
+                    </div>
+
+                    <!-- Statistics Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Investigation Statistics</h3>
+                        </div>
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-value" id="dash-files-analyzed">0</span>
+                                <span class="stat-label">Files Analyzed</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="dash-evidence-items">0</span>
+                                <span class="stat-label">Evidence Items</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="dash-alerts">0</span>
+                                <span class="stat-label">Active Alerts</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-value" id="dash-risk-level">-</span>
+                                <span class="stat-label">Risk Level</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <div class="activity-list" id="dash-recent-activity">
+                            <!-- Activity items will be added here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions Card -->
+                    <div class="dashboard-card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="quick-actions">
+                            <button onclick="showSection('analyze')" class="action-button">New Analysis</button>
+                            <button onclick="showSection('report')" class="action-button">Generate Report</button>
+                            <button onclick="showSection('evidence')" class="action-button">Add Evidence</button>
+                            <button onclick="exportDashboardSummary()" class="action-button">Export Summary</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analysis Summary Section -->
+                <div class="dashboard-row">
+                    <div class="dashboard-card full-width">
+                        <div class="card-header">
+                            <h3>Analysis Summary</h3>
+                        </div>
+                        <div class="summary-tabs">
+                            <button class="tab-button active" onclick="switchSummaryTab('files')">File Analysis</button>
+                            <button class="tab-button" onclick="switchSummaryTab('network')">Network Analysis</button>
+                            <button class="tab-button" onclick="switchSummaryTab('memory')">Memory Analysis</button>
+                        </div>
+                        <div class="summary-content" id="summary-content">
+                            <!-- Summary content will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Keep your existing scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@google/generative-ai"></script>
+    <script src="https://js.puter.com/v2/"></script>
+    <script>
+        // Add these utility functions at the top of your script
+        function formatBytes(bytes, decimals = 2) {
+            if (!bytes || bytes === 0) return '0 Bytes';
+
+            const k = 1024;
+            const dm = decimals < 0 ? 0 : decimals;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+        }
+
+        function formatFileSize(bytes) {
+            return formatBytes(bytes);
+        }
+
+        // Helper function for number formatting
+        function formatNumber(num) {
+            return num.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1,');
+        }
+
+        // Helper function for percentage calculation
+        function calculatePercentage(part, total) {
+            return ((part / total) * 100).toFixed(2);
+        }
+
+        // Helper function for time formatting
+        function formatTime(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        }
+
+        // Helper function for duration formatting
+        function formatDuration(milliseconds) {
+            const seconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            
+            return `${hours}h ${minutes % 60}m ${seconds % 60}s`;
+        }
+
+        // Initialize variables
+        let currentCase = {
+            id: 'FOR-2024-001',
+            status: 'Active',
+            timestamp: new Date().toISOString(),
+            findings: []
+        };
+
+        // Section Management
+        function showSection(sectionId) {
+            const sections = ['dashboard', 'identify', 'preserve', 'analyze', 'verify', 'report'];
+            
+            // Update menu items
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked menu item
+            event.currentTarget.classList.add('active');
+            
+            // Hide all sections
+            sections.forEach(section => {
+                const element = document.querySelector(`#${section}-section`);
+                if (element) element.style.display = 'none';
+            });
+            
+            // Show selected section
+            const selectedSection = document.querySelector(`#${sectionId}-section`);
+            if (selectedSection) selectedSection.style.display = 'block';
+            
+            updateDashboard();
+        }
+
+        // File Analysis Functions
+        async function analyzeFiles() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            const results = document.getElementById('fileAnalysis');
+            
+            if (files.length === 0) {
+                results.innerHTML = '<p class="alert alert-warning">Please select files to analyze</p>';
+                return;
+            }
+
+            results.innerHTML = '<p>Analyzing files...</p>';
+            
+            try {
+                for (let file of files) {
+                    const fileContent = await readFile(file);
+                    const analysis = await analyzeFileContent(file, fileContent);
+                    displayFileAnalysis(analysis);
+                    currentCase.findings.push({
+                        type: 'file',
+                        timestamp: new Date().toISOString(),
+                        data: analysis
+                    });
+                }
+            } catch (error) {
+                results.innerHTML = `<p class="alert alert-danger">Analysis failed: ${error.message}</p>`;
+            }
+
+            updateTimeline();
+        }
+
+        async function readFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (e) => resolve(e.target.result);
+                reader.onerror = (e) => reject(new Error('File reading failed'));
+                reader.readAsText(file);
+            });
+        }
+
+        async function analyzeFileContent(file, content) {
+            // Perform file analysis
+            const suspicious = detectSuspiciousPatterns(content);
+            const riskLevel = calculateRiskLevel(suspicious);
+            
+            return {
+                filename: file.name,
+                filesize: file.size,
+                type: file.type,
+                lastModified: new Date(file.lastModified).toLocaleString(),
+                suspicious: suspicious,
+                riskLevel: riskLevel
+            };
+        }
+
+        // Network Analysis Functions
+        async function analyzeNetwork() {
+            const results = document.getElementById('networkAnalysis');
+            results.innerHTML = '<p>Scanning network...</p>';
+            
+            try {
+                const networkData = await simulateNetworkScan();
+                displayNetworkAnalysis(networkData);
+                currentCase.findings.push({
+                    type: 'network',
+                    timestamp: new Date().toISOString(),
+                    data: networkData
+                });
+            } catch (error) {
+                results.innerHTML = `<p class="alert alert-danger">Network scan failed: ${error.message}</p>`;
+            }
+
+            updateTimeline();
+        }
+
+        async function simulateNetworkScan() {
+            // Simulate network scanning
+            return {
+                connections: generateConnections(),
+                ports: scanPorts(),
+                traffic: analyzeTraffic()
+            };
+        }
+
+        // Memory Analysis Functions
+        async function analyzeMemory() {
+            const results = document.getElementById('memoryAnalysis');
+            results.innerHTML = '<p>Analyzing system memory...</p>';
+            
+            try {
+                const memoryData = await simulateMemoryAnalysis();
+                displayMemoryAnalysis(memoryData);
+                currentCase.findings.push({
+                    type: 'memory',
+                    timestamp: new Date().toISOString(),
+                    data: memoryData
+                });
+            } catch (error) {
+                results.innerHTML = `<p class="alert alert-danger">Memory analysis failed: ${error.message}</p>`;
+            }
+
+            updateTimeline();
+        }
+
+        async function simulateMemoryAnalysis() {
+            // Simulate memory analysis
+            return {
+                totalMemory: 16384, // MB
+                usedMemory: Math.floor(Math.random() * 16384),
+                processes: generateProcessList(),
+                suspicious: detectSuspiciousProcesses()
+            };
+        }
+
+        // Report Generation
+        async function generateReport() {
+            const reportSection = document.getElementById('reportSection');
+            reportSection.innerHTML = '<p>Generating report...</p>';
+            
+            try {
+                const report = await generateComprehensiveReport();
+                displayReport(report);
+            } catch (error) {
+                reportSection.innerHTML = `<p class="alert alert-danger">Report generation failed: ${error.message}</p>`;
+            }
+        }
+
+        // Helper Functions
+        function detectSuspiciousPatterns(content) {
+            const patterns = [];
+            const suspiciousKeywords = ['malware', 'virus', 'exploit', 'hack', 'breach'];
+            
+            suspiciousKeywords.forEach(keyword => {
+                if (content.toLowerCase().includes(keyword)) {
+                    patterns.push(`Found suspicious keyword: ${keyword}`);
+                }
+            });
+            
+            return patterns;
+        }
+
+        function calculateRiskLevel(suspicious) {
+            if (suspicious.length >= 3) return 'High';
+            if (suspicious.length >= 1) return 'Medium';
+            return 'Low';
+        }
+
+        function generateProcessList() {
+            return [
+                { name: 'System', pid: 4, memory: '50MB' },
+                { name: 'Chrome', pid: 1234, memory: '500MB' },
+                { name: 'Explorer', pid: 2345, memory: '100MB' }
+            ];
+        }
+
+        function detectSuspiciousProcesses() {
+            return [
+                { name: 'unknown.exe', pid: 6666, risk: 'High' }
+            ];
+        }
+
+        // Display Functions
+        function displayFileAnalysis(analysis) {
+            const results = document.getElementById('fileAnalysis');
+            results.innerHTML += `
+                <div class="analysis-result">
+                    <h4>${analysis.filename}</h4>
+                    <p>Size: ${formatBytes(analysis.filesize)}</p>
+                    <p>Type: ${analysis.type || 'Unknown'}</p>
+                    <p>Last Modified: ${analysis.lastModified}</p>
+                    <p>Risk Level: <span class="risk-level ${analysis.riskLevel.toLowerCase()}">${analysis.riskLevel}</span></p>
+                    ${analysis.suspicious.length > 0 ? `
+                        <div class="suspicious-findings">
+                            <h5>Suspicious Findings:</h5>
+                            <ul>
+                                ${analysis.suspicious.map(finding => `<li>${finding}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function displayNetworkAnalysis(data) {
+            const results = document.getElementById('networkAnalysis');
+            results.innerHTML = `
+                <div class="network-result">
+                    <h4>Network Analysis Results</h4>
+                    
+                    <div class="section">
+                        <h5>Active Connections</h5>
+                        <div class="connections-list">
+                            ${data.connections.map(conn => `
+                                <div class="connection-item">
+                                    <p><strong>Source:</strong> ${conn.source} → <strong>Destination:</strong> ${conn.destination}</p>
+                                    <p><strong>Protocol:</strong> ${conn.protocol} <strong>Port:</strong> ${conn.port}</p>
+                                    <p><strong>Status:</strong> <span class="status-${conn.status.toLowerCase()}">${conn.status}</span></p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h5>Open Ports</h5>
+                        <div class="ports-list">
+                            <p>Detected ${data.ports.length} open ports:</p>
+                            <p>${data.ports.join(', ')}</p>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <h5>Traffic Analysis</h5>
+                        <div class="traffic-stats">
+                            <p><strong>Inbound Traffic:</strong> ${formatBytes(data.traffic.bytesIn)}</p>
+                            <p><strong>Outbound Traffic:</strong> ${formatBytes(data.traffic.bytesOut)}</p>
+                            <p><strong>Packets In:</strong> ${formatNumber(data.traffic.packetsIn)}</p>
+                            <p><strong>Packets Out:</strong> ${formatNumber(data.traffic.packetsOut)}</p>
+                            <div class="protocol-distribution">
+                                <h6>Protocol Distribution:</h6>
+                                <ul>
+                                    ${Object.entries(data.traffic.protocols).map(([protocol, percentage]) => `
+                                        <li>${protocol}: ${percentage}%</li>
+                                    `).join('')}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function displayMemoryAnalysis(data) {
+            const results = document.getElementById('memoryAnalysis');
+            results.innerHTML = `
+                <div class="memory-result">
+                    <h4>Memory Analysis Results</h4>
+                    <p>Total Memory: ${formatBytes(data.totalMemory * 1024 * 1024)}</p>
+                    <p>Used Memory: ${formatBytes(data.usedMemory * 1024 * 1024)}</p>
+                    <div class="processes">
+                        <h5>Running Processes</h5>
+                        <ul>
+                            ${data.processes.map(proc => `
+                                <li>${proc.name} (PID: ${proc.pid}) - ${proc.memory}</li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize the dashboard when the page loads
+        window.onload = function() {
+            showSection('dashboard');
+            updateDashboard();
+        };
+
+        // Add these network analysis functions
+        function generateConnections() {
+            // Simulate network connections
+            const connections = [
+                { source: '192.168.1.100', destination: '192.168.1.1', protocol: 'TCP', port: 443, status: 'ESTABLISHED' },
+                { source: '192.168.1.100', destination: '8.8.8.8', protocol: 'UDP', port: 53, status: 'ACTIVE' },
+                { source: '192.168.1.100', destination: '172.217.167.78', protocol: 'TCP', port: 80, status: 'ESTABLISHED' }
+            ];
+
+            // Add some random connections
+            const randomIPs = ['10.0.0.1', '172.16.0.1', '192.168.0.1', '8.8.4.4'];
+            const protocols = ['TCP', 'UDP', 'HTTP', 'HTTPS'];
+            const ports = [80, 443, 22, 21, 3306, 3389];
+
+            for (let i = 0; i < Math.floor(Math.random() * 5) + 2; i++) {
+                connections.push({
+                    source: '192.168.1.100',
+                    destination: randomIPs[Math.floor(Math.random() * randomIPs.length)],
+                    protocol: protocols[Math.floor(Math.random() * protocols.length)],
+                    port: ports[Math.floor(Math.random() * ports.length)],
+                    status: Math.random() > 0.5 ? 'ESTABLISHED' : 'ACTIVE'
+                });
+            }
+
+            return connections;
+        }
+
+        function scanPorts() {
+            // Simulate port scanning
+            const commonPorts = [20, 21, 22, 23, 25, 53, 80, 443, 3306, 3389];
+            const openPorts = commonPorts.filter(() => Math.random() > 0.6);
+            
+            // Add some random high ports
+            for (let i = 0; i < 3; i++) {
+                openPorts.push(Math.floor(Math.random() * 60000) + 1024);
+            }
+            
+            return openPorts.sort((a, b) => a - b);
+        }
+
+        function analyzeTraffic() {
+            // Simulate traffic analysis
+            return {
+                bytesIn: Math.floor(Math.random() * 1000000),
+                bytesOut: Math.floor(Math.random() * 1000000),
+                packetsIn: Math.floor(Math.random() * 10000),
+                packetsOut: Math.floor(Math.random() * 10000),
+                protocols: {
+                    TCP: Math.floor(Math.random() * 100),
+                    UDP: Math.floor(Math.random() * 100),
+                    HTTP: Math.floor(Math.random() * 100),
+                    HTTPS: Math.floor(Math.random() * 100)
+                }
+            };
+        }
+
+        // Add these timeline functions
+        function updateTimeline() {
+            const timelineContainer = document.getElementById('timeline');
+            const events = collectTimelineEvents();
+            displayTimeline(timelineContainer, events);
+        }
+
+        function collectTimelineEvents() {
+            // Collect all events from the current case
+            const events = [];
+            
+            if (currentCase.findings) {
+                currentCase.findings.forEach(finding => {
+                    let eventType = '';
+                    let eventDescription = '';
+                    let eventSeverity = 'info';
+
+                    switch(finding.type) {
+                        case 'file':
+                            eventType = 'File Analysis';
+                            eventDescription = `Analyzed file: ${finding.data.basicInfo?.name || 'Unknown file'}`;
+                            eventSeverity = finding.data.securityAnalysis?.riskLevel?.toLowerCase() || 'info';
+                            break;
+                        case 'network':
+                            eventType = 'Network Analysis';
+                            eventDescription = `Detected ${finding.data.connections?.length || 0} connections`;
+                            eventSeverity = finding.data.analysis?.riskLevel?.toLowerCase() || 'info';
+                            break;
+                        case 'memory':
+                            eventType = 'Memory Analysis';
+                            eventDescription = `Analyzed system memory usage and processes`;
+                            eventSeverity = finding.data.riskAssessment?.level?.toLowerCase() || 'info';
+                            break;
+                    }
+
+                    events.push({
+                        timestamp: finding.timestamp,
+                        type: eventType,
+                        description: eventDescription,
+                        severity: eventSeverity
+                    });
+                });
+            }
+
+            // Sort events by timestamp (newest first)
+            return events.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+        }
+
+        function displayTimeline(container, events) {
+            container.innerHTML = `
+                <div class="timeline-container">
+                    <h3>Investigation Timeline</h3>
+                    ${events.length > 0 ? `
+                        <div class="timeline">
+                            ${events.map(event => `
+                                <div class="timeline-item severity-${event.severity}">
+                                    <div class="timeline-marker"></div>
+                                    <div class="timeline-content">
+                                        <div class="timeline-header">
+                                            <span class="event-type">${event.type}</span>
+                                            <span class="event-time">${formatTimeAgo(event.timestamp)}</span>
+                                        </div>
+                                        <div class="timeline-body">
+                                            ${event.description}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    ` : '<p>No investigation events recorded yet.</p>'}
+                </div>
+            `;
+        }
+
+        // Add this helper function to format time ago
+        function formatTimeAgo(timestamp) {
+            const now = new Date();
+            const eventTime = new Date(timestamp);
+            const diffInSeconds = Math.floor((now - eventTime) / 1000);
+
+            if (diffInSeconds < 60) return `${diffInSeconds} seconds ago`;
+            if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+            if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+            return eventTime.toLocaleString();
+        }
+
+        // Add these verification and report generation functions
+        function validateFindings() {
+            const validationMethod = document.getElementById('validationMethod').value;
+            const validationNotes = document.getElementById('validationNotes').value;
+            
+            if (!validationNotes) {
+                alert('Please add validation notes.');
+                return;
+            }
+            
+            const verificationResults = document.getElementById('verificationResults');
+            verificationResults.innerHTML = '<p>Validating findings... Please wait.</p>';
+            
+            setTimeout(() => {
+                const validation = {
+                    method: validationMethod,
+                    notes: validationNotes,
+                    timestamp: new Date().toISOString(),
+                    validator: document.getElementById('examinerName').value || 'Unknown Examiner',
+                    status: Math.random() > 0.1 ? 'VALIDATED' : 'NEEDS_REVIEW'
+                };
+                
+                // Add to case validations
+                if (!currentCase.validations) currentCase.validations = [];
+                currentCase.validations.push(validation);
+                
+                displayValidationResults(validation);
+                
+                // Add to timeline
+                currentCase.findings.push({
+                    type: 'validation',
+                    timestamp: validation.timestamp,
+                    data: {
+                        title: 'Findings Validation',
+                        description: `Validation ${validation.status === 'VALIDATED' ? 'successful' : 'needs review'} using ${validation.method}`,
+                        severity: validation.status === 'VALIDATED' ? 'low' : 'medium'
+                    }
+                });
+                
+                updateTimeline();
+            }, 2000);
+        }
+
+        function displayValidationResults(validation) {
+            const verificationResults = document.getElementById('verificationResults');
+            verificationResults.innerHTML = `
+                <div class="validation-result ${validation.status.toLowerCase()}">
+                    <h4>Validation Results</h4>
+                    <p><strong>Method:</strong> ${validation.method}</p>
+                    <p><strong>Validator:</strong> ${validation.validator}</p>
+                    <p><strong>Date:</strong> ${formatDate(validation.timestamp)}</p>
+                    <p><strong>Status:</strong> <span class="validation-status">${validation.status}</span></p>
+                    <div class="validation-notes">
+                        <h5>Notes:</h5>
+                        <p>${validation.notes}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        function signReport() {
+            const examinerName = document.getElementById('examinerName').value;
+            const examinerTitle = document.getElementById('examinerTitle').value;
+            const certifications = document.getElementById('certifications').value;
+            const signatureDate = document.getElementById('signatureDate').value;
+            
+            if (!examinerName || !examinerTitle || !signatureDate) {
+                alert('Please fill in all required fields for signing the report.');
+                return;
+            }
+            
+            // Create digital signature
+            const signature = {
+                examiner: examinerName,
+                title: examinerTitle,
+                certifications: certifications,
+                date: signatureDate,
+                timestamp: new Date().toISOString(),
+                caseId: currentCase.id,
+                hash: generateReportHash()
+            };
+            
+            currentCase.signature = signature;
+            
+            // Generate and display final report
+            generateFinalReport(signature);
+        }
+
+        function generateFinalReport(signature) {
+            const reportSection = document.getElementById('reportSection');
+            const reportType = document.getElementById('reportType').value;
+            const includeTimeline = document.getElementById('includeTimeline').checked;
+            const includeEvidence = document.getElementById('includeEvidence').checked;
+            
+            reportSection.innerHTML = `
+                <div class="final-report">
+                    <div class="report-header">
+                        <h2>Digital Forensics Investigation Report</h2>
+                        <p><strong>Case ID:</strong> ${currentCase.id}</p>
+                        <p><strong>Report Type:</strong> ${reportType}</p>
+                        <p><strong>Generated:</strong> ${formatDate(new Date())}</p>
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3>Executive Summary</h3>
+                        <p>Investigation of ${currentCase.title || 'Unnamed Case'}</p>
+                        <p><strong>Incident Type:</strong> ${currentCase.incidentType || 'Unknown'}</p>
+                        <p><strong>Severity Level:</strong> ${currentCase.severityLevel || 'Unspecified'}</p>
+                        <p><strong>Affected Systems:</strong> ${currentCase.affectedSystems || 'Unknown'}</p>
+                    </div>
+                    
+                    ${includeEvidence ? generateEvidenceSection() : ''}
+                    ${includeTimeline ? generateTimelineSection() : ''}
+                    
+                    <div class="report-section">
+                        <h3>Key Findings</h3>
+                        ${generateKeyFindings()}
+                    </div>
+                    
+                    <div class="report-section">
+                        <h3>Recommendations</h3>
+                        ${generateRecommendations()}
+                    </div>
+                    
+                    <div class="report-signature">
+                        <h3>Digital Signature</h3>
+                        <p><strong>Examiner:</strong> ${signature.examiner}</p>
+                        <p><strong>Title:</strong> ${signature.title}</p>
+                        ${signature.certifications ? `<p><strong>Certifications:</strong> ${signature.certifications}</p>` : ''}
+                        <p><strong>Date:</strong> ${formatDate(signature.date)}</p>
+                        <p><strong>Report Hash:</strong> <span class="hash-value">${signature.hash}</span></p>
+                    </div>
+                </div>
+                
+                <div class="report-actions">
+                    <button class="action-button" onclick="exportReportPDF()">Export as PDF</button>
+                    <button class="action-button" onclick="exportReportJSON()">Export as JSON</button>
+                </div>
+            `;
+        }
+
+        function generateEvidenceSection() {
+            if (!currentCase.evidence || currentCase.evidence.length === 0) {
+                return '<div class="report-section"><h3>Evidence</h3><p>No evidence records available.</p></div>';
+            }
+            
+            return `
+                <div class="report-section">
+                    <h3>Evidence Collection</h3>
+                    <div class="evidence-summary">
+                        ${currentCase.evidence.map(evidence => `
+                            <div class="evidence-item">
+                                <p><strong>ID:</strong> ${evidence.id}</p>
+                                <p><strong>Source:</strong> ${evidence.source}</p>
+                                <p><strong>Acquisition Method:</strong> ${evidence.method}</p>
+                                <p><strong>Hash (${evidence.hashAlgorithm}):</strong> ${evidence.hash}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateTimelineSection() {
+            if (!currentCase.findings || currentCase.findings.length === 0) {
+                return '<div class="report-section"><h3>Timeline</h3><p>No timeline events recorded.</p></div>';
+            }
+            
+            return `
+                <div class="report-section">
+                    <h3>Investigation Timeline</h3>
+                    <div class="timeline-summary">
+                        ${currentCase.findings.map(finding => `
+                            <div class="timeline-entry">
+                                <span class="timeline-date">${formatDate(finding.timestamp)}</span>
+                                <span class="timeline-event">${finding.data.title}: ${finding.data.description}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function generateKeyFindings() {
+            let findings = '<ul class="findings-list">';
+            
+            // Add file analysis findings
+            if (currentCase.findings) {
+                const fileFindings = currentCase.findings.filter(f => f.type === 'file');
+                if (fileFindings.length > 0) {
+                    findings += '<li><strong>File Analysis:</strong><ul>';
+                    fileFindings.forEach(f => {
+                        findings += `<li>${f.data.description}</li>`;
+                    });
+                    findings += '</ul></li>';
+                }
+            }
+            
+            // Add network findings
+            if (currentCase.findings) {
+                const networkFindings = currentCase.findings.filter(f => f.type === 'network');
+                if (networkFindings.length > 0) {
+                    findings += '<li><strong>Network Analysis:</strong><ul>';
+                    networkFindings.forEach(f => {
+                        findings += `<li>${f.data.description}</li>`;
+                    });
+                    findings += '</ul></li>';
+                }
+            }
+            
+            findings += '</ul>';
+            return findings;
+        }
+
+        function generateReportHash() {
+            // Simulate report hash generation
+            const chars = '0123456789abcdef';
+            let hash = '';
+            for (let i = 0; i < 64; i++) {
+                hash += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return hash;
+        }
+
+        function exportReportPDF() {
+            alert('PDF export functionality will be implemented here');
+            // Implement PDF export
+        }
+
+        function exportReportJSON() {
+            const reportData = {
+                case: currentCase,
+                timestamp: new Date().toISOString(),
+                version: '1.0'
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(reportData, null, 2));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", `forensic_report_${currentCase.id}.json`);
+            document.body.appendChild(downloadAnchorNode);
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+    </script>
+</body>
+</html>

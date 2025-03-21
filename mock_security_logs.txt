@@ -1,0 +1,10 @@
+[2024-03-20 10:15:23] WARNING: Failed login attempt from IP 192.168.1.105
+[2024-03-20 10:15:45] INFO: User admin logged in successfully
+[2024-03-20 10:16:12] ERROR: Suspicious file access detected - /system/config.ini
+[2024-03-20 10:17:00] ALERT: Multiple connection attempts from IP 10.0.0.55
+[2024-03-20 10:18:33] WARNING: Port scan detected from IP 192.168.1.200
+[2024-03-20 10:19:45] ERROR: Unauthorized access attempt to database
+[2024-03-20 10:20:11] INFO: Firewall updated - New rule added
+[2024-03-20 10:21:00] CRITICAL: Possible malware detected - suspicious_file.exe
+[2024-03-20 10:22:15] WARNING: Unusual network traffic pattern detected
+[2024-03-20 10:23:30] ALERT: Brute force attack detected on SSH service 
